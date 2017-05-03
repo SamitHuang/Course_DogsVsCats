@@ -526,13 +526,13 @@ def main(unused_argv):
       metrics=validation_metrics,
       early_stopping_metric="loss",
       early_stopping_metric_minimize=True,  #True
-      early_stopping_rounds=5000)
+      early_stopping_rounds=1000)
   #eval_data = mnist.test.images  # Returns np.array
 
   # Create the Estimator
   classifier = learn.Estimator(
-      model_fn=model_vgg19, model_dir="../model_save/dog_cat_vgg19_origin_pix128"
-      ,config=tf.contrib.learn.RunConfig(save_checkpoints_secs=30))
+      model_fn=model_vgg16, model_dir="../model_save/dog_cat_vgg16_fc1024_pix150"
+      ,config=tf.contrib.learn.RunConfig(save_checkpoints_secs=30,keep_checkpoint_max=10)) #secs=20
   # Set up logging for predictions
   # Log the values in the "Softmax" tensor with label "probabilities"
   tensors_to_log = {"probabilities": "softmax_tensor"}
@@ -576,7 +576,8 @@ def test_predict():
         f.write('id,label\n')
     #print(img_id)
     classifier = learn.Estimator(
-        model_fn=model_vgg16, model_dir="/tmp/dog_cat_vgg16_origin_pix128"
+        model_fn=model_vgg16, model_dir="../model_save/dog_cat_vgg16_fc1024_pix150"
+        #model_fn=cnn_model_fn, model_dir="../model_save/dog_cat_model_acc95"
         )
     #there are 12500 images in the test dataset 
     PRED_BATCH_SIZE=100

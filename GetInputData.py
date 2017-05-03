@@ -9,19 +9,19 @@ import tensorflow as tf
 
 #data setting
 TRAIN_DATA_DIR='../data/train/'
-NUM_TRAIN = 20000
-NUM_TEST = 600
+NUM_TRAIN = 24000
+NUM_TEST = 400
 NUM_TRAIN_DOGS = NUM_TRAIN/2
 NUM_TRAIN_CATS = NUM_TRAIN/2
 NUM_TEST_DOGS=NUM_TEST/2
 NUM_TEST_CATS=NUM_TEST/2
 
-IMAGE_SIZE_WIDTH = 128 #larger scale can improve accuracy till 350, concluded by a guy
-IMAGE_SIZE_HEIGTH = 128
+IMAGE_SIZE_WIDTH = 150 #larger scale can improve accuracy till 350, concluded by a guy
+IMAGE_SIZE_HEIGTH = 150
 
 TEST_DATA_DIR='../data/test/'
 IS_LIMIT_NUM_TEST_UNKNOWN=False
-NUM_TEST_UNKNOWN = 111 #12500
+NUM_TEST_UNKNOWN = 120 #12500
 
 def GetImageLable(imgName):
     '''
@@ -33,7 +33,7 @@ def GetImageLable(imgName):
     if('cat' in imgName):
         return 0
 
-def ProcessImage(imgPath):
+def ProcessImage(imgPath, augment=False):
     '''
     read one image and reshape it (or enhance)
     :param imgPath:
@@ -42,13 +42,13 @@ def ProcessImage(imgPath):
     #img = cv2.imread(imgPath, cv2.IMREAD_COLOR)
     #img = cv2.resize(img,(IMAGE_SIZE_HEIGTH,IMAGE_SIZE_WIDTH))
     img = Image.open(imgPath).convert('RGB').resize((IMAGE_SIZE_HEIGTH, IMAGE_SIZE_WIDTH))
+    if(augment==True):
+        img=img.transpose(Image.FLIP_LEFT_RIGHT);
     dat = np.asarray(img)
     return dat
 
 def GetTrainAndValidateData():
     '''
-    :return: train data, numpy array, 每一个元素包含一个图片数据(np格式)和对应的lable
-             test data,
     '''
     #cat file name
     trainDogImgs=[]
@@ -80,7 +80,7 @@ def GetTrainAndValidateData():
     random.shuffle(trainImgs)
 
     for imgPath in trainImgs:
-        dat=ProcessImage(TRAIN_DATA_DIR + imgPath[0])
+        dat=ProcessImage(TRAIN_DATA_DIR + imgPath[0],augment=True)
         #trainData.append([dat,imgPath[1]])
         trainX.append(dat)
         trainY.append(imgPath[1])
@@ -89,10 +89,20 @@ def GetTrainAndValidateData():
         #testData.append([dat, imgPath[1]])
         testX.append(dat)
         testY.append(imgPath[1])
-
+    
+    np.save("train_data.npy",trainX)
+    np.save("train_label.npy",trainY)
+    np.save("test_data.npy",testX)
+    np.save("test_label.npy",testY)
     #return np.array(trainData),np.array(testData)
-    return np.array(trainX),np.array(trainY),np.array(testX),np.array(testY)
+    return np.array(trainX,dtype=np.float32),np.array(trainY,dtype=np.int32),np.array(testX,dtype=np.float32),np.array(testY,dtype=np.int32)
 
+def LoadTrainAndValidateData():
+    trainX=np.load("train_data.npy")
+    trainY=np.load("train_label.npy")
+    testX=np.load("test_data.npy")
+    testY=np.load("test_data.npy")
+    return np.array(trainX,dtype=np.float32),np.array(trainY,dtype=np.int32),np.array(testX,dtype=np.float32),np.array(testY,dtype=np.int32)
 '''
 def GetTestData():
     #for (i, imgName) in enumerate(os.listdir(TRAIN_DATA_DIR)):
@@ -122,6 +132,11 @@ def GetTestData():
         #img_id.append(imgn.split('.')[0])
     np.save('test_data.npy', test_data)
     np.save('test_data_id.npy', img_ids)
+    return np.array(test_data,dtype=np.float32),img_ids
+
+def LoadTestData():
+    test_data=np.load('test_data.npy')
+    img_ids=np.load('test_data_id.npy')
     return np.array(test_data,dtype=np.float32),img_ids
 
 
