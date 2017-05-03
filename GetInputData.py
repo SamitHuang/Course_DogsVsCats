@@ -9,14 +9,14 @@ import tensorflow as tf
 
 #data setting
 TRAIN_DATA_DIR='../data/train/'
-NUM_TRAIN = 24000
-NUM_TEST = 400
+NUM_TRAIN = 23000
+NUM_TEST = 2000
 NUM_TRAIN_DOGS = NUM_TRAIN/2
 NUM_TRAIN_CATS = NUM_TRAIN/2
 NUM_TEST_DOGS=NUM_TEST/2
 NUM_TEST_CATS=NUM_TEST/2
 
-IMAGE_SIZE_WIDTH = 150 #larger scale can improve accuracy till 350, concluded by a guy
+IMAGE_SIZE_WIDTH = 150 #larger scale can improve accuracy till 350
 IMAGE_SIZE_HEIGTH = 150
 
 TEST_DATA_DIR='../data/test/'
